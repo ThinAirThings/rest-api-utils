@@ -1,0 +1,27 @@
+{
+    "name": "@thinairthings/rest-api-utils",
+    "version": "1.0.0",
+    "description": "Basic rest api utilities",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/ThinAirThings/rest-api-utils.git"
+    },
+    "publishConfig": {
+      "registry": "https://npm.pkg.github.com/",
+      "access": "public"
+    },
+    "scripts": {
+      "npmpub": "tsc && git add . && git commit -m \"mod\" && git push && npm version patch && npm publish --access public"
+    },
+    "keywords": [],
+    "author": "Dan Lannan",
+    "license": "MIT",
+    "dependencies": {
+      "aws-jwt-verify": "^4.0.0"
+    },
+    "devDependencies": {
+      "@types/aws-lambda": "^8.10.117"
+    }
+  }
