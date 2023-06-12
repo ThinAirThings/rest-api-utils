@@ -22,7 +22,10 @@ const restRequestHandler = (handler, verify) => async (event) => {
         });
         return {
             statusCode: 200,
-            body: JSON.stringify(outputPayload)
+            headers: {
+                ...outputPayload.headers,
+            },
+            body: JSON.stringify(outputPayload.body)
         };
     }
     catch (error) {

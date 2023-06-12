@@ -2,7 +2,10 @@ import {APIGatewayProxyEventHeaders, APIGatewayProxyEvent} from 'aws-lambda'
 import { CognitoJwtVerifier } from 'aws-jwt-verify'
 
 export const restRequestHandler = <T>(
-    handler: ({payload, headers}: {payload: T, headers: APIGatewayProxyEventHeaders})=>Promise<any>,
+    handler: ({payload, headers}: {payload: T, headers: APIGatewayProxyEventHeaders})=>Promise<{
+        body: any
+        headers: any
+    }>,
     verify?: boolean,
 ) => async (event: APIGatewayProxyEvent) => {
     // Parse Body
@@ -24,7 +27,10 @@ export const restRequestHandler = <T>(
         })
         return {
             statusCode: 200,
-            body: JSON.stringify(outputPayload)
+            headers: {
+                ...outputPayload.headers,
+            },
+            body: JSON.stringify(outputPayload.body)
         }
     } catch (error) {
         console.error('Error:', error);
