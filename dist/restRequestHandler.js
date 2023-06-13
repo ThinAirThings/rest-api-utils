@@ -24,6 +24,8 @@ const restRequestHandler = (handler, verify) => async (event) => {
             statusCode: 200,
             headers: {
                 ...outputPayload.headers,
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Origin": `${process.env.CORS_DOMAIN}`,
             },
             body: JSON.stringify(outputPayload.body)
         };
