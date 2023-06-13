@@ -9,8 +9,4 @@ export declare const restRequestHandler: <T>(handler: ({ payload, headers }: {
     statusCode: number;
     headers: any;
     body: string;
-} | {
-    statusCode: number;
-    body: string;
-    headers?: undefined;
 }>;

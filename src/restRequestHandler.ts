@@ -1,6 +1,10 @@
 import {APIGatewayProxyEventHeaders, APIGatewayProxyEvent} from 'aws-lambda'
 import { CognitoJwtVerifier } from 'aws-jwt-verify'
 
+const corsHeaders = {
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Allow-Origin": `${process.env.CORS_DOMAIN}`,
+}
 export const restRequestHandler = <T>(
     handler: ({payload, headers}: {payload: T, headers: APIGatewayProxyEventHeaders})=>Promise<Partial<{
         body?: any
@@ -29,8 +33,7 @@ export const restRequestHandler = <T>(
             statusCode: 200,
             headers: {
                 ...outputPayload.headers,
-                "Access-Control-Allow-Credentials": "true",
-                "Access-Control-Allow-Origin": `${process.env.CORS_DOMAIN}`,
+                ...corsHeaders,
             },
             body: JSON.stringify(outputPayload.body)
         }
@@ -38,6 +41,9 @@ export const restRequestHandler = <T>(
         console.error('Error:', error);
         return {
             statusCode: 500,
+            headers: {
+                ...corsHeaders,
+            },
             body: JSON.stringify({
                 message: `The following Error occurred: ${(error as Error).message}`
             })

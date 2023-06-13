@@ -2,6 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.restRequestHandler = void 0;
 const aws_jwt_verify_1 = require("aws-jwt-verify");
+const corsHeaders = {
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Allow-Origin": `${process.env.CORS_DOMAIN}`,
+};
 const restRequestHandler = (handler, verify) => async (event) => {
     // Parse Body
     const inputPayload = typeof event.body === 'object' ? event.body : JSON.parse(event.body);
@@ -24,8 +28,7 @@ const restRequestHandler = (handler, verify) => async (event) => {
             statusCode: 200,
             headers: {
                 ...outputPayload.headers,
-                "Access-Control-Allow-Credentials": "true",
-                "Access-Control-Allow-Origin": `${process.env.CORS_DOMAIN}`,
+                ...corsHeaders,
             },
             body: JSON.stringify(outputPayload.body)
         };
@@ -34,6 +37,9 @@ const restRequestHandler = (handler, verify) => async (event) => {
         console.error('Error:', error);
         return {
             statusCode: 500,
+            headers: {
+                ...corsHeaders,
+            },
             body: JSON.stringify({
                 message: `The following Error occurred: ${error.message}`
             })
