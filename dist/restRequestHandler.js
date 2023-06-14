@@ -41,7 +41,7 @@ const restRequestHandler = (handler, verify) => async (event) => {
                 ...corsHeaders,
             },
             body: JSON.stringify({
-                message: `The following Error occurred: ${error.message}`
+                errorMessage: `The following Error occurred: ${error.message}`
             })
         };
     }

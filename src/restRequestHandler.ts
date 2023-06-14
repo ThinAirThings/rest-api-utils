@@ -45,7 +45,7 @@ export const restRequestHandler = <T>(
                 ...corsHeaders,
             },
             body: JSON.stringify({
-                message: `The following Error occurred: ${(error as Error).message}`
+                errorMessage: `The following Error occurred: ${(error as Error).message}` 
             })
         }
     }
