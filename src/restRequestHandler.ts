@@ -19,7 +19,7 @@ export const restRequestHandler = <T>(
         if (verify) {
             // Verify Token
             await CognitoJwtVerifier.create({
-                userPoolId: process.env.COGNITO__USER_POOL_ID!,
+                userPoolId: process.env.COGNITO__USERPOOL_ID!,
                 clientId: process.env.COGNITO__CLIENT_ID!,
                 tokenUse: 'access',
             }).verify(event.headers.Authorization!.split(' ')[1])

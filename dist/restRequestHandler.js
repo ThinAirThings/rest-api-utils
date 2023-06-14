@@ -14,7 +14,7 @@ const restRequestHandler = (handler, verify) => async (event) => {
         if (verify) {
             // Verify Token
             await aws_jwt_verify_1.CognitoJwtVerifier.create({
-                userPoolId: process.env.COGNITO__USER_POOL_ID,
+                userPoolId: process.env.COGNITO__USERPOOL_ID,
                 clientId: process.env.COGNITO__CLIENT_ID,
                 tokenUse: 'access',
             }).verify(event.headers.Authorization.split(' ')[1]);
