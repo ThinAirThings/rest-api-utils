@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.restRequestHandler = void 0;
 const aws_jwt_verify_1 = require("aws-jwt-verify");
+const Errors_1 = require("./Errors");
+const _1 = require(".");
 const corsHeaders = {
     "Access-Control-Allow-Credentials": "true",
     "Access-Control-Allow-Origin": `${process.env.CORS_DOMAIN}`,
@@ -16,17 +18,23 @@ const restRequestHandler = (handler, verify) => async (event) => {
         inputPayload = event.queryStringParameters;
     }
     else {
-        throw new Error('Invalid HTTP method');
+        throw new Errors_1.BadRequestError('Invalid HTTP method');
     }
     // Run lambda
     try {
         if (verify) {
             // Verify Token
-            await aws_jwt_verify_1.CognitoJwtVerifier.create({
-                userPoolId: process.env.COGNITO__USERPOOL_ID,
-                clientId: process.env.COGNITO__CLIENT_ID,
-                tokenUse: 'access',
-            }).verify(event.headers.Authorization.split(' ')[1]);
+            try {
+                await aws_jwt_verify_1.CognitoJwtVerifier.create({
+                    userPoolId: process.env.COGNITO__USERPOOL_ID,
+                    clientId: process.env.COGNITO__CLIENT_ID,
+                    tokenUse: 'access',
+                }).verify(event.headers.Authorization.split(' ')[1]);
+            }
+            catch (_e) {
+                const e = _e;
+                throw new Errors_1.UnauthorizedError(e.message);
+            }
             // Above will throw if verification fails
         }
         const outputPayload = await handler({
@@ -36,21 +44,24 @@ const restRequestHandler = (handler, verify) => async (event) => {
         return {
             statusCode: 200,
             headers: {
-                ...outputPayload.headers,
+                ...outputPayload?.headers,
                 ...corsHeaders,
             },
-            body: JSON.stringify(outputPayload.body)
+            body: JSON.stringify(outputPayload?.body)
         };
     }
-    catch (error) {
+    catch (_e) {
+        const error = _e;
         console.error('Error:', error);
         return {
-            statusCode: 500,
+            statusCode: error?.statusCode ?? 500,
             headers: {
                 ...corsHeaders,
             },
             body: JSON.stringify({
-                errorMessage: `The following Error occurred: ${error.message}`
+                errorMessage: `The following Error occurred: ${(0, _1.isProd)()
+                    ? error.prodErrorMessage ?? "Internal Server Error"
+                    : error.message}`
             })
         };
     }
