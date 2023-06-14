@@ -7,8 +7,17 @@ const corsHeaders = {
     "Access-Control-Allow-Origin": `${process.env.CORS_DOMAIN}`,
 };
 const restRequestHandler = (handler, verify) => async (event) => {
-    // Parse Body
-    const inputPayload = typeof event.body === 'object' ? event.body : JSON.parse(event.body);
+    // Parse Body or Query String Parameters
+    let inputPayload;
+    if (event.httpMethod === 'POST') {
+        inputPayload = typeof event.body === 'object' ? event.body : JSON.parse(event.body);
+    }
+    else if (event.httpMethod === 'GET') {
+        inputPayload = event.queryStringParameters;
+    }
+    else {
+        throw new Error('Invalid HTTP method');
+    }
     // Run lambda
     try {
         if (verify) {

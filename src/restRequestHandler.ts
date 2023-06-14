@@ -12,8 +12,15 @@ export const restRequestHandler = <T>(
     }>>,
     verify?: boolean,
 ) => async (event: APIGatewayProxyEvent) => {
-    // Parse Body
-    const inputPayload = typeof event.body === 'object' ? event.body : JSON.parse(event.body)
+    // Parse Body or Query String Parameters
+    let inputPayload: T;
+    if (event.httpMethod === 'POST') {
+        inputPayload = typeof event.body === 'object' ? event.body : JSON.parse(event.body);
+    } else if (event.httpMethod === 'GET') {
+        inputPayload = event.queryStringParameters as T;
+    } else {
+        throw new Error('Invalid HTTP method');
+    }
     // Run lambda
     try {
         if (verify) {
