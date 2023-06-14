@@ -61,7 +61,7 @@ export const restRequestHandler = <T>(
                 ...corsHeaders,
             },
             body: JSON.stringify({
-                errorMessage: `The following Error occurred: ${isProd()
+                message: `The following Error occurred: ${isProd()
                     ? error.prodErrorMessage ?? "Internal Server Error"
                     :error.message
                 }` 

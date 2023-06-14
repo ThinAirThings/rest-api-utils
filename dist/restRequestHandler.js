@@ -59,7 +59,7 @@ const restRequestHandler = (handler, verify) => async (event) => {
                 ...corsHeaders,
             },
             body: JSON.stringify({
-                errorMessage: `The following Error occurred: ${(0, _1.isProd)()
+                message: `The following Error occurred: ${(0, _1.isProd)()
                     ? error.prodErrorMessage ?? "Internal Server Error"
                     : error.message}`
             })
