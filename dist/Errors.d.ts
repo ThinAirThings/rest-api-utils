@@ -26,5 +26,5 @@ export declare class MethodNotAllowedError extends Error {
 }
 export declare class BadGatewayError extends Error {
     prodErrorMessage?: string;
-    constructor(message?: string);
+    constructor(service: string, message?: string);
 }

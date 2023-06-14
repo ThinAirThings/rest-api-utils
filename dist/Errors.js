@@ -47,8 +47,8 @@ class MethodNotAllowedError extends Error {
 }
 exports.MethodNotAllowedError = MethodNotAllowedError;
 class BadGatewayError extends Error {
-    constructor(message = 'Bad Gateway') {
-        super(message);
+    constructor(service, message = 'Bad Gateway') {
+        super(`Error in: ${service}: ${message}`);
         this.prodErrorMessage = 'Bad Gateway';
         this.name = 'BadGatewayError';
         this.statusCode = 502;
