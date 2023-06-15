@@ -42,7 +42,7 @@ const restRequestHandler = (handler, verify) => async (event) => {
             headers: event.headers
         });
         return {
-            statusCode: 200,
+            statusCode: outputPayload?.body ? 200 : 204,
             headers: {
                 ...outputPayload?.headers,
                 ...corsHeaders,
