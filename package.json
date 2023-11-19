@@ -13,15 +13,19 @@
         "access": "public"
     },
     "scripts": {
-        "npmpub": "tsc && git add . && git commit -m \"mod\" && git push && npm version patch && npm publish --access public"
+        "build": "tsup",
+        "npmpub": "npm run build && git add . && git commit -m \"mod\" && git push && npm version patch && npm publish"
     },
+    "files": [
+        "dist"
+    ],
     "keywords": [],
     "author": "Dan Lannan",
-    "license": "MIT",
     "dependencies": {
         "aws-jwt-verify": "^4.0.0"
     },
     "devDependencies": {
-        "@types/aws-lambda": "^8.10.117"
+        "@types/aws-lambda": "^8.10.117",
+        "tsup": "^8.0.0"
     }
 }

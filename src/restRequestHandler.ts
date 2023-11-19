@@ -1,71 +1,55 @@
-import {APIGatewayProxyEventHeaders, APIGatewayProxyEvent} from 'aws-lambda'
-import { CognitoJwtVerifier } from 'aws-jwt-verify'
-import { BadRequestError, UnauthorizedError } from './Errors'
-import { isProd } from '.'
+import { APIGatewayProxyEvent, APIGatewayProxyEventHeaders,APIGatewayProxyResult } from "aws-lambda"
+import { parseRequest } from "./fns/parseRequest"
+import { setCorsHeaders } from "./fns/setCorsHeaders"
+import { authenticate } from "./fns/authenticate"
 
-const corsHeaders = {
-    "Access-Control-Allow-Credentials": "true",
-    "Access-Control-Allow-Origin": `${process.env.CORS_DOMAIN}`,
+type HandlerResult = {
+    result?: Record<string, any>,
+    headers?: APIGatewayProxyEventHeaders
 }
 
-export const restRequestHandler = <T>(
-    handler: ({payload, headers}: {payload: T, headers: APIGatewayProxyEventHeaders})=>Promise<Partial<{
-        body?: any
-        headers?: any
-    }>|void>,
-    verify?: boolean,
-) => async (event: APIGatewayProxyEvent) => {
-    // Parse Body or Query String Parameters
-    let inputPayload: T;
-    if (event.httpMethod === 'POST') {
-        inputPayload = typeof event.body === 'object' ? event.body : JSON.parse(event.body);
-    } else if (event.httpMethod === 'GET') {
-        inputPayload = event.queryStringParameters as T;
-    } else {
-        throw new BadRequestError('Invalid HTTP method');
-    }
-    // Run lambda
-    try {
-        if (verify) {
-            // Verify Token
-            try {
-                await CognitoJwtVerifier.create({
-                    userPoolId: process.env.COGNITO__USERPOOL_ID!,
-                    clientId: process.env.COGNITO__CLIENT_ID!,
-                    tokenUse: 'access',
-                }).verify(event.headers.Authorization!.split(' ')[1])
-            } catch (_e) {
-                const e = _e as Error
-                throw new UnauthorizedError(e.message)
-            }
-            // Above will throw if verification fails
-        }
-        const outputPayload = await handler({
-            payload: inputPayload,
-            headers: event.headers
-        })
+export const restApiHandler = <P, R extends HandlerResult>(config: any, handler: ( 
+        payload: P, 
+        headers: APIGatewayProxyEventHeaders
+    ) => Promise<R|void>, opts?: {}
+) => async (
+    event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> => {
+    try { 
+        console.log(event)
+        // Authenticate the request if needed
+        const userId = (process.env.AUTHENTICATE === "true") && await authenticate(event)
+        // Parse the request
+        const payload = parseRequest<P>(event)
+        // Handle the request
+        const result = await handler({...payload, userId}, event.headers)
+        // Return the result
         return {
-            statusCode: outputPayload?.body?200:204,
+            statusCode: result?.result?200:204,
             headers: {
-                ...outputPayload?.headers,
-                ...corsHeaders,
+                ...result?.headers,
+                ...setCorsHeaders(event, config),
             },
-            body: JSON.stringify(outputPayload?.body)
+            body: JSON.stringify(result?.result)
         }
+
     } catch (_e) {
         const error = _e as Error
-        console.error('Error:', error);
+        // Log the error
+        console.error(error)
+        // Return the error
         return {
-            statusCode: error?.statusCode ?? 500,
+            statusCode: error.statusCode ?? 500,
             headers: {
-                ...corsHeaders,
+                ...setCorsHeaders(event, config),
             },
             body: JSON.stringify({
-                message: `The following Error occurred: ${isProd()
+                message: `The following Error occurred: ${process.env.NODE_ENV === 'production'
                     ? error.prodErrorMessage ?? "Internal Server Error"
-                    :error.message
+                    : error.message
                 }` 
             })
         }
     }
 }
+
