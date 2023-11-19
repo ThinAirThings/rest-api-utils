@@ -121,9 +121,10 @@ var authenticate = async (event) => {
 };
 
 // src/restRequestHandler.ts
-var restRequestHandler = (config, handler, opts) => async (event) => {
+var restRequestHandler = ({
+  handler
+}) => async (event) => {
   try {
-    console.log(event);
     const userId = process.env.AUTHENTICATE === "true" && await authenticate(event);
     const payload = parseRequest(event);
     const result = await handler({ ...payload, userId }, event.headers);
@@ -131,7 +132,11 @@ var restRequestHandler = (config, handler, opts) => async (event) => {
       statusCode: result?.result ? 200 : 204,
       headers: {
         ...result?.headers,
-        ...setCorsHeaders(event, config)
+        ...setCorsHeaders(event, {
+          rootDomain: process.env.ROOT_DOMAIN,
+          localHostPort: parseInt(process.env.LOCAL_HOST_PORT),
+          allowedCorsPrefixes: process.env.ALLOWED_CORS_PREFIXES.split(",")
+        })
       },
       body: JSON.stringify(result?.result)
     };
@@ -141,7 +146,11 @@ var restRequestHandler = (config, handler, opts) => async (event) => {
     return {
       statusCode: error.statusCode ?? 500,
       headers: {
-        ...setCorsHeaders(event, config)
+        ...setCorsHeaders(event, {
+          rootDomain: process.env.ROOT_DOMAIN,
+          localHostPort: parseInt(process.env.LOCAL_HOST_PORT),
+          allowedCorsPrefixes: process.env.ALLOWED_CORS_PREFIXES.split(",")
+        })
       },
       body: JSON.stringify({
         message: `The following Error occurred: ${process.env.NODE_ENV === "production" ? error.prodErrorMessage ?? "Internal Server Error" : error.message}`

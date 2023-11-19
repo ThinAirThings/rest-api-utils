@@ -8,15 +8,23 @@ type HandlerResult = {
     headers?: APIGatewayProxyEventHeaders
 }
 
-export const restRequestHandler = <P, R extends HandlerResult>(config: any, handler: ( 
+export type RestRequestConfig = {
+    rootDomain: string,
+    localHostPort: number,
+    allowedCorsPrefixes: string[],
+}
+
+export const restRequestHandler = <P, R extends HandlerResult>({
+    handler 
+}: {
+    handler: ( 
         payload: P, 
         headers: APIGatewayProxyEventHeaders
-    ) => Promise<R|void>, opts?: {}
-) => async (
+    ) => Promise<R|void>, 
+}) => async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
     try { 
-        console.log(event)
         // Authenticate the request if needed
         const userId = (process.env.AUTHENTICATE === "true") && await authenticate(event)
         // Parse the request
@@ -26,9 +34,13 @@ export const restRequestHandler = <P, R extends HandlerResult>(config: any, hand
         // Return the result
         return {
             statusCode: result?.result?200:204,
-            headers: {
+            headers: { 
                 ...result?.headers,
-                ...setCorsHeaders(event, config),
+                ...setCorsHeaders(event, {
+                    rootDomain: process.env.ROOT_DOMAIN as string,
+                    localHostPort: parseInt(process.env.LOCAL_HOST_PORT as string),
+                    allowedCorsPrefixes: (process.env.ALLOWED_CORS_PREFIXES as string).split(','),
+                }),
             },
             body: JSON.stringify(result?.result)
         }
@@ -41,7 +53,11 @@ export const restRequestHandler = <P, R extends HandlerResult>(config: any, hand
         return {
             statusCode: error.statusCode ?? 500,
             headers: {
-                ...setCorsHeaders(event, config),
+                ...setCorsHeaders(event, {
+                    rootDomain: process.env.ROOT_DOMAIN as string,
+                    localHostPort: parseInt(process.env.LOCAL_HOST_PORT as string),
+                    allowedCorsPrefixes: (process.env.ALLOWED_CORS_PREFIXES as string).split(','),
+                }),
             },
             body: JSON.stringify({
                 message: `The following Error occurred: ${process.env.NODE_ENV === 'production'

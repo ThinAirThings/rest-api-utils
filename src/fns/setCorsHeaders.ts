@@ -1,7 +1,12 @@
 import { APIGatewayProxyEvent } from "aws-lambda"
-import { CdkConfig } from "../../.."
 
-export const setCorsHeaders = (event: APIGatewayProxyEvent, config: Pick<CdkConfig, 'rootDomain' | 'localHostPort' | 'allowedCorsPrefixes'>) => {
+
+type CorsConfig = {
+    rootDomain: string,
+    localHostPort: number,
+    allowedCorsPrefixes: string[],
+}
+export const setCorsHeaders = (event: APIGatewayProxyEvent, config: CorsConfig) => {
     const origin = event.headers.origin || event.headers.Origin
     const whitelist = [...config.allowedCorsPrefixes.map(prefix => `https://${prefix}.${config.rootDomain}`), `https://${config.rootDomain}`]
     return {
