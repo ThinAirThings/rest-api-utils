@@ -8,7 +8,7 @@ type HandlerResult = {
     headers?: APIGatewayProxyEventHeaders
 }
 
-export const restApiHandler = <P, R extends HandlerResult>(config: any, handler: ( 
+export const restRequestHandler = <P, R extends HandlerResult>(config: any, handler: ( 
         payload: P, 
         headers: APIGatewayProxyEventHeaders
     ) => Promise<R|void>, opts?: {}

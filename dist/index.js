@@ -27,7 +27,7 @@ __export(src_exports, {
   NotFoundError: () => NotFoundError,
   UnauthorizedError: () => UnauthorizedError,
   isProd: () => isProd,
-  restApiHandler: () => restApiHandler
+  restRequestHandler: () => restRequestHandler
 });
 module.exports = __toCommonJS(src_exports);
 
@@ -121,7 +121,7 @@ var authenticate = async (event) => {
 };
 
 // src/restRequestHandler.ts
-var restApiHandler = (config, handler, opts) => async (event) => {
+var restRequestHandler = (config, handler, opts) => async (event) => {
   try {
     console.log(event);
     const userId = process.env.AUTHENTICATE === "true" && await authenticate(event);
@@ -163,5 +163,5 @@ var isProd = () => {
   NotFoundError,
   UnauthorizedError,
   isProd,
-  restApiHandler
+  restRequestHandler
 });

@@ -4,7 +4,7 @@ type HandlerResult = {
     result?: Record<string, any>;
     headers?: APIGatewayProxyEventHeaders;
 };
-declare const restApiHandler: <P, R extends HandlerResult>(config: any, handler: (payload: P, headers: APIGatewayProxyEventHeaders) => Promise<void | R>, opts?: {}) => (event: APIGatewayProxyEvent) => Promise<APIGatewayProxyResult>;
+declare const restRequestHandler: <P, R extends HandlerResult>(config: any, handler: (payload: P, headers: APIGatewayProxyEventHeaders) => Promise<void | R>, opts?: {}) => (event: APIGatewayProxyEvent) => Promise<APIGatewayProxyResult>;
 
 declare global {
     interface Error {
@@ -39,4 +39,4 @@ declare class BadGatewayError extends Error {
 
 declare const isProd: () => boolean;
 
-export { BadGatewayError, BadRequestError, ForbiddenError, MethodNotAllowedError, NotFoundError, UnauthorizedError, isProd, restApiHandler };
+export { BadGatewayError, BadRequestError, ForbiddenError, MethodNotAllowedError, NotFoundError, UnauthorizedError, isProd, restRequestHandler };
