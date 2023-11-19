@@ -121,9 +121,7 @@ var authenticate = async (event) => {
 };
 
 // src/restRequestHandler.ts
-var restRequestHandler = ({
-  handler
-}) => async (event) => {
+var restRequestHandler = (handler) => async (event) => {
   try {
     const userId = process.env.AUTHENTICATE === "true" && await authenticate(event);
     const payload = parseRequest(event);

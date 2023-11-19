@@ -9,9 +9,7 @@ type RestRequestConfig = {
     localHostPort: number;
     allowedCorsPrefixes: string[];
 };
-declare const restRequestHandler: <P, R extends HandlerResult>({ handler }: {
-    handler: (payload: P, headers: APIGatewayProxyEventHeaders) => Promise<void | R>;
-}) => (event: APIGatewayProxyEvent) => Promise<APIGatewayProxyResult>;
+declare const restRequestHandler: <P, R extends HandlerResult>(handler: (payload: P, headers: APIGatewayProxyEventHeaders) => Promise<void | R>) => (event: APIGatewayProxyEvent) => Promise<APIGatewayProxyResult>;
 
 declare global {
     interface Error {

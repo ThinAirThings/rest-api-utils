@@ -14,14 +14,11 @@ export type RestRequestConfig = {
     allowedCorsPrefixes: string[],
 }
 
-export const restRequestHandler = <P, R extends HandlerResult>({
-    handler 
-}: {
-    handler: ( 
+export const restRequestHandler = <P, R extends HandlerResult>(handler: ( 
         payload: P, 
         headers: APIGatewayProxyEventHeaders
     ) => Promise<R|void>, 
-}) => async (
+) => async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
     try { 
