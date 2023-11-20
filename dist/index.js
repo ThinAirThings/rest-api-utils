@@ -107,13 +107,11 @@ var setCorsHeaders = (event, config) => {
 var import_aws_jwt_verify = require("aws-jwt-verify");
 var authenticate = async (event) => {
   try {
-    console.log(event.headers);
     const payload = await import_aws_jwt_verify.CognitoJwtVerifier.create({
       userPoolId: process.env.COGNITO__USERPOOL_ID,
       clientId: process.env.COGNITO__CLIENT_ID,
       tokenUse: "access"
     }).verify(event.headers.Authorization.split(" ")[1]);
-    console.log(payload);
     return payload.username;
   } catch (_e) {
     throw new UnauthorizedError("Failure at Cognito Token Verification in 'authenticate' function.");
@@ -123,9 +121,14 @@ var authenticate = async (event) => {
 // src/restRequestHandler.ts
 var restRequestHandler = (handler) => async (event) => {
   try {
+    console.log(event.pathParameters);
     const userId = process.env.AUTHENTICATE === "true" && await authenticate(event);
     const payload = parseRequest(event);
-    const result = await handler({ ...payload, userId }, event.headers);
+    const result = await handler({
+      ...payload,
+      userId,
+      ...event.pathParameters
+    }, event.headers);
     return {
       statusCode: result?.result ? 200 : 204,
       headers: {

@@ -22,12 +22,17 @@ export const restRequestHandler = <P, R extends HandlerResult>(handler: (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
     try { 
+        console.log(event.pathParameters)
         // Authenticate the request if needed
         const userId = (process.env.AUTHENTICATE === "true") && await authenticate(event)
         // Parse the request
         const payload = parseRequest<P>(event)
         // Handle the request
-        const result = await handler({...payload, userId}, event.headers)
+        const result = await handler({
+            ...payload, 
+            userId,
+            ...event.pathParameters
+        }, event.headers)
         // Return the result
         return {
             statusCode: result?.result?200:204,
