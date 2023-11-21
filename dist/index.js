@@ -85,6 +85,7 @@ var BadGatewayError = class extends Error {
 var parseRequest = (event) => {
   switch (event.httpMethod) {
     case "POST":
+    case "DELETE":
       return typeof event.body === "object" ? event.body : JSON.parse(event.body);
     case "GET":
       return event.queryStringParameters;
@@ -121,7 +122,6 @@ var authenticate = async (event) => {
 // src/restRequestHandler.ts
 var restRequestHandler = (handler) => async (event) => {
   try {
-    console.log(event.pathParameters);
     const userId = process.env.AUTHENTICATE === "true" && await authenticate(event);
     const payload = parseRequest(event);
     const result = await handler({

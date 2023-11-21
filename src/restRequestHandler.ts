@@ -22,7 +22,6 @@ export const restRequestHandler = <P, R extends HandlerResult>(handler: (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
     try { 
-        console.log(event.pathParameters)
         // Authenticate the request if needed
         const userId = (process.env.AUTHENTICATE === "true") && await authenticate(event)
         // Parse the request
