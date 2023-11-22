@@ -14,7 +14,7 @@ export const setCorsHeaders = (event: APIGatewayProxyEvent, config: CorsConfig) 
             ? whitelist.includes(origin)
                 ? origin
                 : `https://${config.rootDomain}`
-            : [`http://localhost:${config.localHostPort}`, `https://app.dev.${config.rootDomain}`, ...config.allowedCorsPrefixes].includes(origin!)
+            : [`http://localhost:${config.localHostPort}`, `https://app.dev.${config.rootDomain}`, `http://localhost:4173`].includes(origin!)
                 ? origin!
                 : `http://localhost:${config.localHostPort}`,
         'Access-Control-Allow-Credentials': true,
