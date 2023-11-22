@@ -106,8 +106,25 @@ var setCorsHeaders = (event, config) => {
 
 // src/fns/authenticate.ts
 var import_aws_jwt_verify = require("aws-jwt-verify");
+var import_client_dynamodb = require("@aws-sdk/client-dynamodb");
+var import_lib_dynamodb = require("@aws-sdk/lib-dynamodb");
+var db = import_lib_dynamodb.DynamoDBDocumentClient.from(new import_client_dynamodb.DynamoDBClient({}));
 var authenticate = async (event) => {
   try {
+    const authToken = event.headers.Authorization.split(" ")[1];
+    if (!authToken)
+      throw new UnauthorizedError("No Authorization Token found. Endpoint requires either API Key or Access Token.");
+    if (authToken.startsWith("sk_")) {
+      const { Item } = await db.send(new import_lib_dynamodb.GetCommand({
+        TableName: process.env.API_KEY_TABLE_NAME,
+        Key: {
+          apiKey: authToken
+        }
+      }));
+      if (!Item)
+        throw new UnauthorizedError("Invalid API Key");
+      return Item.userId;
+    }
     const payload = await import_aws_jwt_verify.CognitoJwtVerifier.create({
       userPoolId: process.env.COGNITO__USERPOOL_ID,
       clientId: process.env.COGNITO__CLIENT_ID,
@@ -115,7 +132,8 @@ var authenticate = async (event) => {
     }).verify(event.headers.Authorization.split(" ")[1]);
     return payload.username;
   } catch (_e) {
-    throw new UnauthorizedError("Failure at Cognito Token Verification in 'authenticate' function.");
+    const e = _e;
+    throw new UnauthorizedError(`Failure at authentication: ${e.message}`);
   }
 };
 
