@@ -1,6 +1,6 @@
 {
     "name": "@thinairthings/rest-api-utils",
-    "version": "1.0.28",
+    "version": "1.0.29",
     "description": "Basic rest api utilities",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
