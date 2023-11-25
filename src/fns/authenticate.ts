@@ -6,7 +6,7 @@ import { DynamoDBDocumentClient, GetCommand, PutCommand } from "@aws-sdk/lib-dyn
 
 
 const db = DynamoDBDocumentClient.from(new DynamoDBClient({}))
-export const authenticate = async (event: APIGatewayProxyEvent) => {
+export const authenticate = async (event: APIGatewayProxyEvent): Promise<string> => {
     try {
         const authToken = event.headers.Authorization!.split(' ')[1]
         if (!authToken) throw new UnauthorizedError("No Authorization Token found. Endpoint requires either API Key or Access Token.")

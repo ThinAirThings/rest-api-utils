@@ -6,5 +6,4 @@ export default defineConfig({
     shims: true,
     dts: true,
     format: ['cjs'],
-    publicDir: './src/components/AuthenticationStack/public'
 })

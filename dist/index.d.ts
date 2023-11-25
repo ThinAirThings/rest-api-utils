@@ -1,4 +1,4 @@
-import { APIGatewayProxyEventHeaders, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyEventHeaders, APIGatewayProxyEvent } from 'aws-lambda';
 
 type HandlerResult = {
     result?: Record<string, any>;
@@ -9,7 +9,14 @@ type RestRequestConfig = {
     localHostPort: number;
     allowedCorsPrefixes: string[];
 };
-declare const restRequestHandler: <P>(handler: (payload: P, headers: APIGatewayProxyEventHeaders) => Promise<HandlerResult | void>) => (event: APIGatewayProxyEvent) => Promise<APIGatewayProxyResult>;
+declare const restRequestHandler: <P>(handler: (payload: P, headers: APIGatewayProxyEventHeaders) => Promise<HandlerResult | void>) => (event: APIGatewayProxyEvent, _context: any) => Promise<{
+    statusCode: number;
+    headers: {
+        'Access-Control-Allow-Origin': string;
+        'Access-Control-Allow-Credentials': boolean;
+    };
+    body: string;
+}>;
 
 declare global {
     interface Error {

@@ -1,7 +1,6 @@
-import { APIGatewayProxyEvent, APIGatewayProxyEventHeaders,APIGatewayProxyResult } from "aws-lambda"
+import { APIGatewayProxyEvent, APIGatewayProxyEventHeaders } from "aws-lambda"
 import { parseRequest } from "./fns/parseRequest"
 import { setCorsHeaders } from "./fns/setCorsHeaders"
-import { authenticate } from "./fns/authenticate"
 
 type HandlerResult = {
     result?: Record<string, any>,
@@ -18,18 +17,14 @@ export const restRequestHandler = <P>(handler: (
         payload: P, 
         headers: APIGatewayProxyEventHeaders
     ) => Promise<HandlerResult|void>, 
-) => async (
-    event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> => {
+) => async (event: APIGatewayProxyEvent, _context: any) => {
     try { 
-        // Authenticate the request if needed
-        const userId = (process.env.AUTHENTICATE === "true") && await authenticate(event)
         // Parse the request
         const payload = parseRequest<P>(event)
         // Handle the request
         const result = await handler({
             ...payload, 
-            userId,
+            userId: event.requestContext.authorizer?.userId,
             ...event.pathParameters
         }, event.headers)
         // Return the result
@@ -45,7 +40,6 @@ export const restRequestHandler = <P>(handler: (
             },
             body: JSON.stringify(result?.result)
         }
-
     } catch (_e) {
         const error = _e as Error
         // Log the error
@@ -69,4 +63,7 @@ export const restRequestHandler = <P>(handler: (
         }
     }
 }
+
+
+
 
