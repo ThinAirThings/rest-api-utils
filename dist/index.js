@@ -102,7 +102,9 @@ var setCorsHeaders = (event, config) => {
     "Access-Control-Allow-Origin": origin && process.env.NODE_ENV === "production" ? whitelist.includes(origin) ? origin : `https://${config.rootDomain}` : [
       `http://localhost:${config.localHostPort}`,
       `http://localhost:${config.localHostPort + 1}`,
-      `https://localhost:3000`,
+      `http://localhost:3000`,
+      `https://${config.rootDomain}`,
+      `https://app.${config.rootDomain}`,
       `https://app.dev.${config.rootDomain}`,
       ...whitelist
     ].includes(origin) ? origin : `http://localhost:${config.localHostPort}`,
